@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>Weather a Year Ago Today</title>
+
+<style>
+  *,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f5f7fa;
+  margin: 0;
+  padding: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 520px;
+  margin: auto;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+h1 {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 13px;
+  margin-bottom: 18px;
+  color: #555;
+}
+
+input {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.dropdown {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+}
+
+.dropdown div {
+  padding: 14px;
+  font-size: 15px;
+}
+
+.dropdown div:active {
+  background: #e5e7eb;
+}
+
+button {
+  position: sticky;
+  bottom: 12px;
+  width: 100%;
+  padding: 18px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  border-radius: 16px;
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.weather-box {
+  background: #f1f5f9;
+  padding: 16px;
+  border-radius: 16px;
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.summary {
+  margin-top: 14px;
+  padding: 14px;
+  background: #e6f4ea;
+  border-radius: 16px;
+  font-size: 14px;
+  min-height: 40px;
+}
+
+.summary.loading {
+  color: #999;
+  font-style: italic;
+}
+
+.trend {
+  margin-top: 10px;
+  padding: 12px;
+  background: #eef2ff;
+  border-radius: 16px;
+  font-size: 14px;
+}
+
+.icon {
+  font-size: 20px;
+  margin-right: 6px;
+}
+
+@media (min-width: 640px) {
+  body {
+    padding: 40px 16px;
+  }
+
+  .card {
+    padding: 20px 18px;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card">
+
+<h1>Year-Ago Weather</h1>
+<p class="subtitle">
+Find out what the weather was like last year — and settle arguments forever.
+</p>
+
+<input id="search" placeholder="Search city..." oninput="searchCity()" />
+<div id="results" class="dropdown"></div>
+
+<button onclick="render()">Check the Weather</button>
+
+<div id="today"></div>
+<div id="lastYear"></div>
+<div class="summary" id="summary"></div>
+<div class="trend" id="trend"></div>
+
+</div>
+</div>
+
+<script>
+let selectedLocation = null;
+
+function cToF(c){ return Math.round((c * 9/5) + 32); }
+
+function getWeather(code){
+  const map = {
+    0:{text:"clear skies", icon:"☀️"},
+    1:{text:"mostly clear", icon:"🌤"},
+    2:{text:"partly cloudy", icon:"⛅"},
+    3:{text:"overcast", icon:"☁️"},
+    45:{text:"foggy", icon:"🌫"},
+    61:{text:"light rain", icon:"🌦"},
+    63:{text:"rain", icon:"🌧"},
+    65:{text:"heavy rain", icon:"🌧"},
+    71:{text:"snow", icon:"❄️"},
+    80:{text:"showers", icon:"🌦"},
+    95:{text:"thunderstorms", icon:"⛈"}
+  };
+  return map[code] || {text:"mixed chaos", icon:"🌥"};
+}
+
+async function searchCity(){
+  const q = document.getElementById("search").value;
+  if(q.length < 3) return;
+
+  const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${q}`);
+  const data = await res.json();
+
+  const results = document.getElementById("results");
+  results.innerHTML = "";
+
+  if(!data.results) return;
+
+  data.results.slice(0,5).forEach(r=>{
+    const div = document.createElement("div");
+
+    const label = `${r.name}, ${r.admin1 || ""}, ${r.country}`;
+    div.innerText = label;
+
+    div.onclick = ()=>{
+      selectedLocation = r;
+      document.getElementById("search").value = label;
+      results.innerHTML = "";
+    };
+
+    results.appendChild(div);
+  });
+}
+
+async function render(){
+  if(!selectedLocation){
+    document.getElementById("summary").innerText = "Pick a real place first.";
+    return;
+  }
+
+  const { latitude, longitude, name, admin1 } = selectedLocation;
+  const locationLabel = admin1 ? `${name}, ${admin1}` : name;
+
+  const today = new Date();
+  const lastYear = new Date();
+  lastYear.setFullYear(today.getFullYear()-1);
+
+  const f = d=>d.toISOString().split("T")[0];
+
+  const todayData = await (await fetch(
+    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`
+  )).json();
+
+  const lastData = await (await fetch(
+    `https://archive-api.open-meteo.com/v1/archive?latitude=${latitude}&longitude=${longitude}&start_date=${f(lastYear)}&end_date=${f(lastYear)}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`
+  )).json();
+
+  const th = cToF(todayData.daily.temperature_2m_max[0]);
+  const tl = cToF(todayData.daily.temperature_2m_min[0]);
+  const todayWeather = getWeather(todayData.daily.weathercode[0]);
+
+  const lh = cToF(lastData.daily.temperature_2m_max[0]);
+  const ll = cToF(lastData.daily.temperature_2m_min[0]);
+  const lastWeather = getWeather(lastData.daily.weathercode[0]);
+
+  document.getElementById("today").innerHTML =
+    `<div class="weather-box">
+      <strong>Today (${locationLabel})</strong><br>
+      ${th}° / ${tl}°<br>
+      <span class="icon">${todayWeather.icon}</span>${todayWeather.text}
+    </div>`;
+
+  document.getElementById("lastYear").innerHTML =
+    `<div class="weather-box">
+      <strong>Last Year</strong><br>
+      ${lh}° / ${ll}°<br>
+      <span class="icon">${lastWeather.icon}</span>${lastWeather.text}
+    </div>`;
+
+  // Show loading state while generating commentary
+  const summaryEl = document.getElementById("summary");
+  summaryEl.classList.add("loading");
+  summaryEl.innerText = "✨ Generating witty commentary...";
+
+  // Get AI-generated witty commentary
+  try {
+    const commentResponse = await fetch("http://localhost:3000/api/weather-comment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        todayWeather: todayWeather.text,
+        lastWeather: lastWeather.text,
+        todayTemp: th,
+        lastTemp: lh,
+        location: locationLabel
+      })
+    });
+
+    const commentData = await commentResponse.json();
+    summaryEl.classList.remove("loading");
+    summaryEl.innerText = commentData.commentary;
+  } catch (error) {
+    console.error("Error fetching AI commentary:", error);
+    
+    // Fallback if server is down
+    summaryEl.classList.remove("loading");
+    const summaryLines = [
+      `Last year was ${lastWeather.text} at ${lh}°. Today? ${todayWeather.text} at ${th}°. Progress? Debatable.`,
+      `If you remember it being nicer last year… you might be wrong.`,
+      `Weather memory is unreliable. Data is not.`,
+      `Last year: ${lh}°. Today: ${th}°. Nature doing whatever it wants.`
+    ];
+    summaryEl.innerText =
+      summaryLines[Math.floor(Math.random()*summaryLines.length)];
+  }
+
+  document.getElementById("trend").innerText =
+    th > lh
+      ? "Warmer than last year. Climate glow-up."
+      : "Colder than last year. Nature chose violence.";
+}
+</script>
+
+</body>
+</html>
