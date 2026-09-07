@@ -1,0 +1,14 @@
+{
+  "buildCommand": "npm install",
+  "devCommand": "node server.js",
+  "installCommand": "npm install",
+  "env": {
+    "HUGGINGFACE_API_TOKEN": "@huggingface_api_token"
+  },
+  "functions": {
+    "api/weather-comment.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  }
+}

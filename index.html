@@ -69,6 +69,11 @@ input {
 .dropdown div {
   padding: 14px;
   font-size: 15px;
+  cursor: pointer;
+}
+
+.dropdown div:hover {
+  background: #f0f0f0;
 }
 
 .dropdown div:active {
@@ -87,6 +92,11 @@ button {
   font-size: 17px;
   font-weight: 700;
   margin-bottom: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
 }
 
 .weather-box {
@@ -166,6 +176,11 @@ Find out what the weather was like last year — and settle arguments forever.
 
 <script>
 let selectedLocation = null;
+
+// Determine API endpoint
+const API_BASE = window.location.hostname === 'localhost' 
+  ? 'http://localhost:3000'
+  : window.location.origin;
 
 function cToF(c){ return Math.round((c * 9/5) + 32); }
 
@@ -266,7 +281,7 @@ async function render(){
 
   // Get AI-generated witty commentary
   try {
-    const commentResponse = await fetch("http://localhost:3000/api/weather-comment", {
+    const commentResponse = await fetch(`${API_BASE}/api/weather-comment`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
