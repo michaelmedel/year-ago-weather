@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
 <title>Weather a Year Ago Today</title>
 
@@ -115,11 +118,7 @@ button:hover {
   border-radius: 16px;
   font-size: 14px;
   min-height: 40px;
-}
-
-.summary.loading {
-  color: #999;
-  font-style: italic;
+  font-weight: 500;
 }
 
 .trend {
@@ -176,11 +175,6 @@ Find out what the weather was like last year — and settle arguments forever.
 
 <script>
 let selectedLocation = null;
-
-// Determine API endpoint
-const API_BASE = window.location.hostname === 'localhost' 
-  ? 'http://localhost:3000'
-  : window.location.origin;
 
 function cToF(c){ return Math.round((c * 9/5) + 32); }
 
@@ -274,47 +268,25 @@ async function render(){
       <span class="icon">${lastWeather.icon}</span>${lastWeather.text}
     </div>`;
 
-  // Show loading state while generating commentary
-  const summaryEl = document.getElementById("summary");
-  summaryEl.classList.add("loading");
-  summaryEl.innerText = "✨ Generating witty commentary...";
+  // Witty commentary options
+  const summaryLines = [
+    `Last year: ${lh}° and ${lastWeather.text}. Today: ${th}° and ${todayWeather.text}. Progress? Debatable.`,
+    `If you remember it being nicer last year… you might be delusional.`,
+    `Weather memory is unreliable. Data is not. You were wrong.`,
+    `Last year: ${lh}°. Today: ${th}°. Nature said: plot twist.`,
+    `Expecting the same weather? That's adorable.`,
+    `The earth has literally rotated around the sun and decided chaos.`,
+    `${lastWeather.text} last year. ${todayWeather.text} now. Shocking.`,
+    `One year older, zero ability to predict the weather. That's you.`
+  ];
 
-  // Get AI-generated witty commentary
-  try {
-    const commentResponse = await fetch(`${API_BASE}/api/weather-comment`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        todayWeather: todayWeather.text,
-        lastWeather: lastWeather.text,
-        todayTemp: th,
-        lastTemp: lh,
-        location: locationLabel
-      })
-    });
-
-    const commentData = await commentResponse.json();
-    summaryEl.classList.remove("loading");
-    summaryEl.innerText = commentData.commentary;
-  } catch (error) {
-    console.error("Error fetching AI commentary:", error);
-    
-    // Fallback if server is down
-    summaryEl.classList.remove("loading");
-    const summaryLines = [
-      `Last year was ${lastWeather.text} at ${lh}°. Today? ${todayWeather.text} at ${th}°. Progress? Debatable.`,
-      `If you remember it being nicer last year… you might be wrong.`,
-      `Weather memory is unreliable. Data is not.`,
-      `Last year: ${lh}°. Today: ${th}°. Nature doing whatever it wants.`
-    ];
-    summaryEl.innerText =
-      summaryLines[Math.floor(Math.random()*summaryLines.length)];
-  }
+  document.getElementById("summary").innerText =
+    summaryLines[Math.floor(Math.random()*summaryLines.length)];
 
   document.getElementById("trend").innerText =
     th > lh
-      ? "Warmer than last year. Climate glow-up."
-      : "Colder than last year. Nature chose violence.";
+      ? `Warmer than last year (+${th-lh}°). Nature said: have some heat.`
+      : `Colder than last year (${th-lh}°). Nature chose violence.`;
 }
 </script>
 
