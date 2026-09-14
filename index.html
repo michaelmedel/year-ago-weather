@@ -9,27 +9,37 @@
 <meta http-equiv="Expires" content="0">
 
 <title>Weather a Year Ago Today</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
 
 <style>
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: #f5f7fa;
+  margin: 0;
   padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  -webkit-font-smoothing: antialiased;
 }
 
-main.container {
+.container {
   max-width: 520px;
   margin: auto;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-article {
-  margin: 0;
+.card {
+  background: white;
   padding: clamp(16px, 5vw, 24px);
+  border-radius: 18px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
 h1 {
   text-align: center;
+  font-size: clamp(21px, 6vw, 26px);
   margin-bottom: 0;
 }
 
@@ -45,16 +55,29 @@ h1 {
 
 .subtitle {
   text-align: center;
+  font-size: 13px;
   margin: 0 0 18px;
+  color: #555;
+}
+
+input {
+  width: 100%;
+  min-height: 52px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  margin-bottom: 8px;
 }
 
 .dropdown {
-  background: var(--pico-card-background-color);
-  border: var(--pico-border-width) solid var(--pico-muted-border-color);
-  border-radius: var(--pico-border-radius);
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 14px;
   max-height: 200px;
   overflow-y: auto;
-  margin: -12px 0 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.05);
 }
 
 .dropdown div {
@@ -64,34 +87,64 @@ h1 {
 }
 
 .dropdown div:hover {
-  background: var(--pico-secondary-background);
+  background: #f0f0f0;
+}
+
+button {
+  width: 100%;
+  min-height: 52px;
+  padding: 14px 18px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  border-radius: 16px;
+  font-size: 17px;
+  font-weight: 700;
+  margin: 12px 0 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
 }
 
 .reset-button {
   display: block;
   width: auto;
+  min-height: 40px;
   margin: 0;
-  padding: 6px 10px;
-  font-size: 0.8rem;
+  padding: 8px 14px;
+  background: transparent;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.reset-button:hover {
+  background: #f8fafc;
+  color: #0f172a;
 }
 
 .weather-box {
-  background: var(--pico-secondary-background);
+  background: #f1f5f9;
   padding: 16px;
-  border-radius: var(--pico-border-radius);
+  border-radius: 16px;
   margin-top: 12px;
   line-height: 1.5;
 }
 
 .location-context {
   margin: 14px 0 10px;
-  color: var(--pico-muted-color);
+  color: #475569;
   font-weight: 700;
 }
 
 .weather-box strong {
   display: block;
   margin-bottom: 6px;
+  color: #0f172a;
 }
 
 .summary {
@@ -104,7 +157,7 @@ h1 {
   min-height: clamp(150px, 24vh, 230px);
   padding: 24px 20px;
   background: #e6f4ea;
-  border-radius: var(--pico-border-radius);
+  border-radius: 16px;
   color: #14532d;
   line-height: 1.35;
   font-weight: 700;
@@ -168,8 +221,9 @@ h1 {
 }
 
 @media (max-width: 639px) {
-  article {
+  .card {
     padding: 16px;
+    border-radius: 14px;
   }
 
   .summary {
@@ -188,31 +242,6 @@ h1 {
   }
 }
 
-@media (max-width: 420px) {
-  body {
-    padding-right: max(8px, env(safe-area-inset-right));
-    padding-left: max(8px, env(safe-area-inset-left));
-  }
-
-  .weather-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .weather-grid .weather-box {
-    min-height: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-  }
-}
-
 @keyframes weather-bob {
   0%, 100% { transform: translateY(0) rotate(-2deg); }
   50% { transform: translateY(-3px) rotate(2deg); }
@@ -228,12 +257,12 @@ h1 {
 
 <body>
 
-<main class="container">
-<article>
+<div class="container">
+<div class="card">
 
 <header class="page-header">
   <h1>Whether App</h1>
-  <button class="secondary outline reset-button" type="button" onclick="resetForm()" title="Clear the search and results">Clear</button>
+  <button class="reset-button" type="button" onclick="resetForm()" title="Clear the search and results">Clear</button>
   <p class="subtitle">
   Compare today's weather with last year's 🤷
   </p>
@@ -251,8 +280,8 @@ h1 {
 </div>
 <div class="summary is-hidden" id="summary">Your AI weather verdict will appear here.</div>
 
-</article>
-</main>
+</div>
+</div>
 
 <script>
 let selectedLocation = null;
