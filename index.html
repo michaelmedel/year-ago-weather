@@ -148,6 +148,10 @@ button:hover {
   color: #0f172a;
 }
 
+.weather-condition {
+  display: block;
+}
+
 .summary {
   margin-top: 14px;
   display: flex;
@@ -397,15 +401,15 @@ async function render(){
   document.getElementById("today").innerHTML =
     `<div class="weather-box">
       <strong>Today</strong>
-      ${th}° / ${tl}°<br>
-      <span class="icon">${todayWeather.icon}</span>${todayWeather.text}
+      <span>${th}° / ${tl}°</span>
+      <span class="weather-condition"><span class="icon">${todayWeather.icon}</span>${todayWeather.text}</span>
     </div>`;
 
   document.getElementById("lastYear").innerHTML =
     `<div class="weather-box">
       <strong>Last Year</strong>
-      ${lh}° / ${ll}°<br>
-      <span class="icon">${lastWeather.icon}</span>${lastWeather.text}
+      <span>${lh}° / ${ll}°</span>
+      <span class="weather-condition"><span class="icon">${lastWeather.icon}</span>${lastWeather.text}</span>
     </div>`;
 
     const summary = document.getElementById("summary");
