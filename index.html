@@ -292,8 +292,6 @@ button:hover {
 </div>
 <div id="results" class="dropdown"></div>
 
-<button type="button" onclick="render()">Check the Weather</button>
-
 <div class="location-context" id="locationContext"></div>
 <div class="weather-grid">
   <div id="today"></div>
@@ -372,6 +370,7 @@ async function searchCity(){
       selectedLocation = r;
       document.getElementById("search").value = label;
       results.innerHTML = "";
+      render();
     };
 
     results.appendChild(div);
