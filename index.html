@@ -383,6 +383,14 @@ async function render(){
     return;
   }
 
+  const summary = document.getElementById("summary");
+  summary.classList.remove("is-hidden");
+  summary.classList.add("is-loading");
+  summary.innerHTML = '<span class="ai-spinner" aria-label="Loading weather"></span>';
+  document.getElementById("locationContext").innerText = "";
+  document.getElementById("today").innerHTML = "";
+  document.getElementById("lastYear").innerHTML = "";
+
   const { latitude, longitude, name, admin1 } = selectedLocation;
   const locationLabel = admin1 ? `${name}, ${admin1}` : name;
 
@@ -425,8 +433,6 @@ async function render(){
       <span class="weather-condition"><span class="icon">${lastWeather.icon}</span><span>${lastWeather.text}</span></span>
     </div>`;
 
-    const summary = document.getElementById("summary");
-    summary.classList.remove("is-hidden");
     summary.classList.add("is-loading");
     summary.innerHTML = '<span class="ai-spinner" aria-label="AI is generating a response"></span>';
 
