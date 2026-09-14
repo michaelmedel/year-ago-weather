@@ -18,7 +18,7 @@
 }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #f5f7fa;
+  background: #87ceeb;
   margin: 0;
   padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   -webkit-font-smoothing: antialiased;
@@ -31,6 +31,9 @@ body {
 }
 
 .card {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 36px);
   background: white;
   padding: clamp(16px, 5vw, 24px);
   border-radius: 18px;
@@ -153,6 +156,7 @@ button:hover {
 }
 
 .summary {
+  flex: 1 0 auto;
   margin-top: 14px;
   display: flex;
   flex-direction: column;
@@ -261,6 +265,10 @@ button:hover {
 @media (min-width: 640px) {
   body {
     padding: 40px 16px;
+  }
+
+  .card {
+    min-height: calc(100dvh - 80px);
   }
 }
 </style>
