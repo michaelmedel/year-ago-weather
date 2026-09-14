@@ -2,150 +2,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
 <title>Weather a Year Ago Today</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
 
 <style>
-  *,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: #f5f7fa;
-  margin: 0;
-  padding: 16px;
-  -webkit-font-smoothing: antialiased;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
 }
 
-.container {
+main.container {
   max-width: 520px;
   margin: auto;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 18px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+article {
+  margin: 0;
+  padding: clamp(16px, 5vw, 24px);
 }
 
 h1 {
   text-align: center;
-  font-size: 22px;
-  margin-bottom: 6px;
+  margin-bottom: 0;
+}
+
+.page-header {
+  position: relative;
+}
+
+.page-header .reset-button {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .subtitle {
   text-align: center;
-  font-size: 13px;
-  margin-bottom: 18px;
-  color: #555;
-}
-
-input {
-  width: 100%;
-  padding: 16px;
-  border-radius: 14px;
-  border: 1px solid #ddd;
-  font-size: 16px;
-  margin-bottom: 8px;
-  box-sizing: border-box;
+  margin: 0 0 18px;
 }
 
 .dropdown {
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 14px;
+  background: var(--pico-card-background-color);
+  border: var(--pico-border-width) solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
   max-height: 200px;
   overflow-y: auto;
-  margin-bottom: 16px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+  margin: -12px 0 16px;
 }
 
 .dropdown div {
-  padding: 14px;
-  font-size: 15px;
+  min-height: 44px;
+  padding: 12px 16px;
   cursor: pointer;
 }
 
 .dropdown div:hover {
-  background: #f0f0f0;
+  background: var(--pico-secondary-background);
 }
 
-.dropdown div:active {
-  background: #e5e7eb;
-}
-
-button {
-  position: sticky;
-  bottom: 12px;
-  width: 100%;
-  padding: 18px;
-  border: none;
-  background: #2563eb;
-  color: white;
-  border-radius: 16px;
-  font-size: 17px;
-  font-weight: 700;
-  margin-bottom: 16px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #1d4ed8;
+.reset-button {
+  display: block;
+  width: auto;
+  margin: 0;
+  padding: 6px 10px;
+  font-size: 0.8rem;
 }
 
 .weather-box {
-  background: #f1f5f9;
+  background: var(--pico-secondary-background);
   padding: 16px;
-  border-radius: 16px;
+  border-radius: var(--pico-border-radius);
   margin-top: 12px;
-  font-size: 15px;
   line-height: 1.5;
+}
+
+.location-context {
+  margin: 14px 0 10px;
+  color: var(--pico-muted-color);
+  font-weight: 700;
+}
+
+.weather-box strong {
+  display: block;
+  margin-bottom: 6px;
 }
 
 .summary {
   margin-top: 14px;
-  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: clamp(150px, 24vh, 230px);
+  padding: 24px 20px;
   background: #e6f4ea;
-  border-radius: 16px;
-  font-size: 14px;
-  min-height: 40px;
-  font-weight: 500;
+  border-radius: var(--pico-border-radius);
+  color: #14532d;
+  line-height: 1.35;
+  font-weight: 700;
+  text-align: center;
 }
 
-.trend {
-  margin-top: 10px;
-  padding: 12px;
-  background: #eef2ff;
-  border-radius: 16px;
-  font-size: 14px;
+.summary.is-hidden {
+  display: none;
+}
+
+.summary.is-loading {
+  justify-content: center;
+}
+
+.ai-spinner {
+  width: 34px;
+  height: 34px;
+  border: 4px solid rgba(20, 83, 45, 0.2);
+  border-top-color: #15803d;
+  border-radius: 50%;
+  animation: ai-spin 0.8s linear infinite;
+}
+
+.ai-icon {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 42px;
+  line-height: 1;
+}
+
+@keyframes ai-spin {
+  to { transform: rotate(360deg); }
 }
 
 .icon {
-  font-size: 20px;
-  margin-right: 6px;
+  display: inline-block;
+  margin: 2px 0 6px;
+  font-size: 30px;
+  line-height: 1;
+  filter: drop-shadow(0 3px 3px rgba(15, 23, 42, 0.12));
+}
+
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.weather-grid > div {
+  min-width: 0;
+}
+
+.weather-grid .weather-box {
+  min-height: 116px;
+  margin-top: 0;
+}
+
+#today,
+#lastYear {
+  min-width: 0;
+}
+
+@media (max-width: 639px) {
+  article {
+    padding: 16px;
+  }
+
+  .summary {
+    line-height: 1.4;
+  }
+
+
+  .summary {
+    min-height: 180px;
+    padding: 24px 18px;
+  }
+
+  .weather-grid .icon {
+    font-size: 36px;
+    animation: weather-bob 2.8s ease-in-out infinite;
+  }
+}
+
+@media (max-width: 420px) {
+  body {
+    padding-right: max(8px, env(safe-area-inset-right));
+    padding-left: max(8px, env(safe-area-inset-left));
+  }
+
+  .weather-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .weather-grid .weather-box {
+    min-height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes weather-bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-3px) rotate(2deg); }
 }
 
 @media (min-width: 640px) {
   body {
     padding: 40px 16px;
-  }
-
-  .card {
-    padding: 20px 18px;
-  }
-
-  h1 {
-    font-size: 26px;
   }
 }
 </style>
@@ -153,31 +228,49 @@ button:hover {
 
 <body>
 
-<div class="container">
-<div class="card">
+<main class="container">
+<article>
 
-<h1>Year-Ago Weather</h1>
-<p class="subtitle">
-Find out what the weather was like last year — and settle arguments forever.
-</p>
+<header class="page-header">
+  <h1>Whether App</h1>
+  <button class="secondary outline reset-button" type="button" onclick="resetForm()" title="Clear the search and results">Clear</button>
+  <p class="subtitle">
+  Compare today's weather with last year's 🤷
+  </p>
+</header>
 
-<input id="search" placeholder="Search city..." oninput="searchCity()" />
+<input id="search" type="search" aria-label="Search city" placeholder="Search city..." oninput="searchCity()">
 <div id="results" class="dropdown"></div>
 
-<button onclick="render()">Check the Weather</button>
+<button type="button" onclick="render()">Check the Weather</button>
 
-<div id="today"></div>
-<div id="lastYear"></div>
-<div class="summary" id="summary"></div>
-<div class="trend" id="trend"></div>
+<div class="location-context" id="locationContext"></div>
+<div class="weather-grid">
+  <div id="today"></div>
+  <div id="lastYear"></div>
+</div>
+<div class="summary is-hidden" id="summary">Your AI weather verdict will appear here.</div>
 
-</div>
-</div>
+</article>
+</main>
 
 <script>
 let selectedLocation = null;
 
 function cToF(c){ return Math.round((c * 9/5) + 32); }
+
+function resetForm(){
+  selectedLocation = null;
+  document.getElementById("search").value = "";
+  document.getElementById("results").innerHTML = "";
+  document.getElementById("locationContext").innerText = "";
+  document.getElementById("today").innerHTML = "";
+  document.getElementById("lastYear").innerHTML = "";
+  const summary = document.getElementById("summary");
+  summary.classList.remove("is-loading");
+  summary.classList.add("is-hidden");
+  summary.innerHTML = "Your AI weather verdict will appear here.";
+}
 
 function getWeather(code){
   const map = {
@@ -194,6 +287,17 @@ function getWeather(code){
     95:{text:"thunderstorms", icon:"⛈"}
   };
   return map[code] || {text:"mixed chaos", icon:"🌥"};
+}
+
+function getResponseIcon(response, todayWeather, lastWeather, temperatureDelta){
+  const language = response.toLowerCase();
+  if (language.includes("rain") || language.includes("wet") || language.includes("storm")) return "🌧️";
+  if (language.includes("snow") || language.includes("cold") || language.includes("freeze")) return "🥶";
+  if (language.includes("heat") || language.includes("hot") || temperatureDelta > 5) return "🔥";
+  if (language.includes("chaos") || language.includes("wild") || language.includes("dramatic")) return "🌪️";
+  if (todayWeather.text.includes("clear") || todayWeather.text.includes("sun")) return "😎";
+  if (lastWeather.text.includes("rain")) return "🤨";
+  return temperatureDelta === 0 ? "🤷" : temperatureDelta > 0 ? "🌡️" : "🧥";
 }
 
 async function searchCity(){
@@ -255,39 +359,56 @@ async function render(){
   const ll = cToF(lastData.daily.temperature_2m_min[0]);
   const lastWeather = getWeather(lastData.daily.weathercode[0]);
 
+  document.getElementById("locationContext").innerText =
+    `Weather comparison for ${locationLabel}`;
+
   document.getElementById("today").innerHTML =
     `<div class="weather-box">
-      <strong>Today (${locationLabel})</strong><br>
+      <strong>Today</strong>
       ${th}° / ${tl}°<br>
       <span class="icon">${todayWeather.icon}</span>${todayWeather.text}
     </div>`;
 
   document.getElementById("lastYear").innerHTML =
     `<div class="weather-box">
-      <strong>Last Year</strong><br>
+      <strong>Last Year</strong>
       ${lh}° / ${ll}°<br>
       <span class="icon">${lastWeather.icon}</span>${lastWeather.text}
     </div>`;
 
-  // Witty commentary options
-  const summaryLines = [
-    `Last year: ${lh}° and ${lastWeather.text}. Today: ${th}° and ${todayWeather.text}. Progress? Debatable.`,
-    `If you remember it being nicer last year… you might be delusional.`,
-    `Weather memory is unreliable. Data is not. You were wrong.`,
-    `Last year: ${lh}°. Today: ${th}°. Nature said: plot twist.`,
-    `Expecting the same weather? That's adorable.`,
-    `The earth has literally rotated around the sun and decided chaos.`,
-    `${lastWeather.text} last year. ${todayWeather.text} now. Shocking.`,
-    `One year older, zero ability to predict the weather. That's you.`
-  ];
+    const summary = document.getElementById("summary");
+    summary.classList.remove("is-hidden");
+    summary.classList.add("is-loading");
+    summary.innerHTML = '<span class="ai-spinner" aria-label="AI is generating a response"></span>';
 
-  document.getElementById("summary").innerText =
-    summaryLines[Math.floor(Math.random()*summaryLines.length)];
+    try {
+      const commentaryResponse = await fetch("/api/weather-comment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          todayWeather: todayWeather.text,
+          lastWeather: lastWeather.text,
+          todayTemp: th,
+          lastTemp: lh,
+          location: locationLabel
+        })
+      });
 
-  document.getElementById("trend").innerText =
-    th > lh
-      ? `Warmer than last year (+${th-lh}°). Nature said: have some heat.`
-      : `Colder than last year (${th-lh}°). Nature chose violence.`;
+      const commentaryData = await commentaryResponse.json();
+      if (!commentaryResponse.ok || !commentaryData.commentary) {
+        throw new Error(commentaryData.error || "AI commentary unavailable");
+      }
+
+      summary.classList.remove("is-loading");
+      const commentary = commentaryData.commentary;
+      const temperatureDelta = th - lh;
+      const icon = getResponseIcon(commentary, todayWeather, lastWeather, temperatureDelta);
+      summary.innerHTML = `<span class="ai-icon" aria-hidden="true">${icon}</span><span>${commentary}</span>`;
+    } catch (error) {
+      summary.classList.remove("is-loading");
+      summary.innerText = "The AI is unavailable right now. The weather remains suspicious.";
+    }
+
 }
 </script>
 
