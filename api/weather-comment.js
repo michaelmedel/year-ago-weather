@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
   const { todayWeather, lastWeather, todayTemp, lastTemp, location } = req.body;
 
-  const prompt = `Generate one witty, edgy weather comment in 20 words or fewer. Compare today's weather in ${location} (${todayTemp} degrees, ${todayWeather}) with last year's (${lastTemp} degrees, ${lastWeather}). Be sarcastic, but avoid politics and religion. Return only the comment.`;
+  const prompt = `Generate one witty, edgy weather comment in 20 words or fewer. Compare today's weather in ${location} (${todayTemp} degrees, ${todayWeather}) with last year's (${lastTemp} degrees, ${lastWeather}). Use 3 to 5 relevant weather emojis. Be sarcastic, but avoid politics and religion. Return only the comment.`;
 
   try {
     const response = await fetch('https://router.huggingface.co/v1/chat/completions', {
